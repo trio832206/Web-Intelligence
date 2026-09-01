@@ -1,0 +1,191 @@
+:root {
+  --sans: 'Wakorin', sans-serif;
+  --heading: 'Wakorin', serif;
+  --mono: ui-monospace, Consolas, monospace;
+  --pattern-ornate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%23d4af37' stroke-width='1.5' stroke-opacity='0.3'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z M15 15L45 45 M15 45L45 15 M30 15L45 30L30 45L15 30Z' /%3E%3Ccircle cx='30' cy='30' r='10' /%3E%3Ccircle cx='30' cy='30' r='21' /%3E%3C/g%3E%3C/svg%3E");
+  --pattern-dense: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cg fill='none' stroke='%23d4af37' stroke-width='1' stroke-opacity='0.25'%3E%3Cpath d='M15 0L30 15L15 30L0 15Z M7.5 7.5L22.5 22.5 M7.5 22.5L22.5 7.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+[data-theme='dark'] {
+  --text: #2c1a0b;
+  --text-h: #1a0f05;
+  --bg: rgba(225, 175, 75, 0.75); /* Softer golden lamp glow */
+  --border: #e6b800; /* Muted glowing border */
+  --code-bg: rgba(235, 190, 95, 0.70);
+  --shadow-inset: inset 0 0 15px rgba(255, 255, 255, 0.8), inset 0 0 5px rgba(212, 175, 55, 0.3);
+  --shadow-outset: 0 5px 15px rgba(0, 0, 0, 0.6), 0 3px 3px rgba(0, 0, 0, 0.4);
+  --scenery-bg: url('/dark_tulip_bg.jpg');
+  --bg-overlay: rgba(18, 4, 8, 0.55);
+}
+
+[data-theme='light'] {
+  --text: #e2e8f0;
+  --text-h: #ffffff;
+  --bg: rgba(20, 15, 5, 0.92); /* Blackish gold */
+  --border: #b8860b; /* Dark goldenrod border */
+  --code-bg: rgba(10, 8, 3, 0.9);
+  --shadow-inset: inset 0 0 12px rgba(184, 134, 11, 0.4), inset 0 0 3px rgba(218, 165, 32, 0.2);
+  --shadow-outset: 0 5px 15px rgba(0, 0, 0, 0.7), 0 3px 5px rgba(10, 8, 3, 0.5);
+  --scenery-bg: url('/persian_sunlight_bg.jpg');
+  --bg-overlay: rgba(8, 6, 24, 0.60);
+}
+
+/* Accent Colors */
+[data-accent='teal'] {
+  --accent-base: #0f766e;
+  --accent-light: #14b8a6;
+}
+
+[data-accent='red'] {
+  --accent-base: #9f1239;
+  --accent-light: #e11d48;
+}
+
+[data-accent='black-opal'] {
+  --accent-base: #1e1b4b;
+  --accent-light: #38bdf8;
+}
+
+[data-accent='sapphire'] {
+  --accent-base: #1e3a8a;
+  --accent-light: #3b82f6;
+}
+
+[data-accent='amethyst'] {
+  --accent-base: #581c87;
+  --accent-light: #a855f7;
+}
+
+[data-accent='emerald'] {
+  --accent-base: #064e3b;
+  --accent-light: #10b981;
+}
+
+body {
+  font: 16px/1.5 var(--sans);
+  letter-spacing: 0.3px;
+  color: var(--text);
+  background-color: #12030a;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  transition: background-color 0.5s ease, color 0.5s ease;
+  position: relative;
+  z-index: 0;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+body::before {
+  /* Light Theme */
+  background-image:
+    linear-gradient(rgba(8, 6, 24, 0.60), rgba(8, 6, 24, 0.60)),
+    url('/new_light_bg.jpg');
+  opacity: 1;
+}
+
+[data-theme='dark'] body::before {
+  opacity: 0;
+}
+
+body::after {
+  /* Dark Theme */
+  background-image:
+    linear-gradient(rgba(18, 4, 8, 0.55), rgba(18, 4, 8, 0.55)),
+    url('/dark_tulip_bg.jpg');
+  opacity: 0;
+}
+
+[data-theme='dark'] body::after {
+  opacity: 1;
+}
+
+#root {
+  width: 100vw;
+  max-width: 100%;
+  margin: 0;
+  text-align: left;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4 {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+h1 {
+  font-size: 32px;
+  margin: 16px 0;
+}
+
+h2 {
+  font-size: 24px;
+  margin: 0 0 8px;
+}
+
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 14px;
+  padding: 4px 8px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-base);
+}
