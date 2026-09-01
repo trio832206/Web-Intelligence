@@ -12,7 +12,7 @@ Web Intelligence is a comprehensive platform designed for advanced web data craw
 
 ## Technology Stack
 ### Frontend
-- React with TypeScript
+- React with JavaScript
 - Vite
 - Custom CSS with dynamic theme switching
 
