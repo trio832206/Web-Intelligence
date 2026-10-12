@@ -1,0 +1,28 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & Secrets
+.env
+.env.local
+backend/.env
+
+# Build outputs
+frontend/dist/
+dist/
+
+# Databases & local stores
+*.db
+*.sqlite
+backend/*.db
+backend/.cache/
+
+# Agent/scratch metadata
+.agents/
+graphify-out/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
