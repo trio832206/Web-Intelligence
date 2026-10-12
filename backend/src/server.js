@@ -26,10 +26,27 @@ startBackgroundTasks();
 
 // 3. Global Middleware
 app.use(cors({
-  origin: [FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174', 'http://localhost:3000'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost, github.io, onrender.com, or any configured FRONTEND_URL
+    if (
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.includes('github.io') ||
+      origin.includes('onrender.com') ||
+      origin.includes('vercel.app') ||
+      origin === FRONTEND_URL
+    ) {
+      return callback(null, true);
+    }
+    
+    return callback(null, true); // Allow all origins for the public API gateway
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With']
 }));
 
 app.use(express.json({ limit: '10mb' }));
