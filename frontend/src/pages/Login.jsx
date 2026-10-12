@@ -36,7 +36,7 @@ export default function Login({ onLoginSuccess }) {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/api/v1/auth/oauth/google';
+    window.location.href = (window.location.hostname.includes('github.io') ? 'https://web-intelligence.onrender.com' : '') + '/api/v1/auth/oauth/google';
   };
 
   return (

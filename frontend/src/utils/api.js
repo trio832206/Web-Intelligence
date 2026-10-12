@@ -3,6 +3,10 @@
  * Completely prevents "Unexpected token < in JSON at position 0" and JSON parse crashes.
  */
 
+// If deployed on GitHub Pages or custom domain, target the live Render gateway
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
+  (window.location.hostname.includes('github.io') ? 'https://web-intelligence.onrender.com' : '');
+
 export function safeJsonParse(raw, fallback = null) {
   if (raw === null || raw === undefined) return fallback;
   if (typeof raw === 'object') return raw;
@@ -16,7 +20,7 @@ export function safeJsonParse(raw, fallback = null) {
 /**
  * Enhanced fetch wrapper that safely decodes JSON and standardizes error responses.
  */
-export async function apiFetch(url, options = {}) {
+export async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('webintel_token');
   const headers = new Headers(options.headers || {});
 
@@ -37,16 +41,19 @@ export async function apiFetch(url, options = {}) {
     body = JSON.stringify(body);
   }
 
+  // Prepend API_BASE_URL if endpoint starts with /api
+  const targetUrl = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+
   let res;
   try {
-    res = await fetch(url, {
+    res = await fetch(targetUrl, {
       ...options,
       headers,
       body
     });
   } catch (netErr) {
     const errorMsg = netErr.message?.includes('Failed to fetch')
-      ? 'Unable to connect to intelligence gateway. Please verify the backend is active on port 8000.'
+      ? 'Unable to connect to intelligence gateway. Please verify the backend service is reachable.'
       : `Network error: ${netErr.message}`;
     throw new Error(errorMsg);
   }
@@ -67,7 +74,7 @@ export async function apiFetch(url, options = {}) {
       }
     }
   } catch (parseErr) {
-    console.warn(`[apiFetch] Response from ${url} was not valid JSON:`, parseErr.message);
+    console.warn(`[apiFetch] Response from ${targetUrl} was not valid JSON:`, parseErr.message);
   }
 
   if (!res.ok) {
@@ -78,7 +85,7 @@ export async function apiFetch(url, options = {}) {
       } else if (res.status === 403) {
         message = 'Access denied: Administrator privileges required.';
       } else if (res.status === 404) {
-        message = `Resource not found (HTTP 404): ${url}`;
+        message = `Resource not found (HTTP 404): ${targetUrl}`;
       } else if (res.status === 502 || res.status === 503 || res.status === 504) {
         message = `Gateway unavailable (HTTP ${res.status}). Verify the backend server is running.`;
       } else {
@@ -98,5 +105,6 @@ export const api = {
   get: (url, options) => apiFetch(url, { ...options, method: 'GET' }),
   post: (url, body, options) => apiFetch(url, { ...options, method: 'POST', body }),
   put: (url, body, options) => apiFetch(url, { ...options, method: 'PUT', body }),
+  patch: (url, body, options) => apiFetch(url, { ...options, method: 'PATCH', body }),
   delete: (url, body, options) => apiFetch(url, { ...options, method: 'DELETE', body })
 };
