@@ -315,10 +315,20 @@ authRouter.delete('/delete-account', requireAuth, async (req, res) => {
   res.json({ message: 'Account deleted successfully' });
 });
 
+// Helper to resolve redirect URI dynamically if not explicitly specified
+function getOAuthRedirectUri(req) {
+  if (process.env.GOOGLE_REDIRECT_URI || process.env.OAUTH_REDIRECT_URI) {
+    return process.env.GOOGLE_REDIRECT_URI || process.env.OAUTH_REDIRECT_URI;
+  }
+  const host = req.get('host') || 'localhost:8000';
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  return `${proto}://${host}/api/v1/auth/oauth/google/callback`;
+}
+
 // GET /api/v1/auth/oauth/google
 authRouter.get('/oauth/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8000/api/v1/auth/oauth/google/callback';
+  const redirectUri = getOAuthRedirectUri(req);
 
   if (!clientId) {
     // Return friendly status indicating credentials needed in .env or provide mock login
@@ -336,7 +346,17 @@ authRouter.get('/oauth/google', (req, res) => {
 // GET /api/v1/auth/oauth/google/callback
 authRouter.get('/oauth/google/callback', async (req, res) => {
   const { code } = req.query;
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  // Auto-detect frontend URL (supports GitHub Pages, custom domain or env override)
+  let frontendUrl = process.env.FRONTEND_URL;
+  if (!frontendUrl) {
+    const origin = req.get('origin') || req.get('referer');
+    if (origin && (origin.includes('github.io') || origin.includes('localhost'))) {
+      const u = new URL(origin);
+      frontendUrl = u.origin + (u.pathname.startsWith('/Web-Intelligence') ? '/Web-Intelligence' : '');
+    } else {
+      frontendUrl = 'https://trio832206.github.io/Web-Intelligence';
+    }
+  }
 
   if (!code) {
     return res.redirect(`${frontendUrl}/login?error=missing_code`);
@@ -345,7 +365,7 @@ authRouter.get('/oauth/google/callback', async (req, res) => {
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8000/api/v1/auth/oauth/google/callback';
+    const redirectUri = getOAuthRedirectUri(req);
 
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
