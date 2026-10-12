@@ -55,6 +55,35 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+
+// Root & Health Check Endpoints
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ONLINE',
+    service: 'Web Intelligence Platform Gateway',
+    version: '1.0.0',
+    documentation: '/api/v1',
+    endpoints: {
+      crawls: '/api/v1/crawls',
+      auth: '/api/v1/auth/me',
+      research: '/api/v1/research/sessions',
+      alerts: '/api/v1/alerts'
+    }
+  });
+});
+
+app.get('/api/v1', (req, res) => {
+  res.json({
+    status: 'OPERATIONAL',
+    api_root: '/api/v1',
+    health: 'OK'
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', uptime: process.uptime() });
+});
+
 // 6. Mount API Routers
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/admin', adminRouter);
@@ -82,6 +111,6 @@ app.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`🌐 Web Intelligence Node.js Gateway running on port ${PORT}`);
   console.log(`🛡️  Security Middleware Active`);
-  console.log(`⚡ API Root: http://localhost:${PORT}/api/v1`);
+  console.log(`⚡ API Root: /api/v1 (Port ${PORT})`);
   console.log(`====================================================`);
 });
